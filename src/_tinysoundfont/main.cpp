@@ -47,11 +47,16 @@ public:
         }
     }
 
-    SoundFont(const std::string& filename)
+    SoundFont(py::str filename)
     {
-        obj = tsf_load_filename(filename.c_str());
+        // Use Python's open to correctly handle non-ASCII paths on all platforms
+        py::module_ builtins = py::module_::import("builtins");
+        py::object file_obj = builtins.attr("open")(filename, "rb");
+        std::string data = file_obj.attr("read")().cast<std::string>();
+        file_obj.attr("close")();
+        obj = tsf_load_memory(data.data(), data.size());
         if (!obj) {
-            throw std::runtime_error(std::string("Could not load SoundFont file: ") + filename);
+            throw std::runtime_error(std::string("Could not load SoundFont file: ") + filename.cast<std::string>());
         }
     }
 
@@ -314,7 +319,7 @@ PYBIND11_MODULE(_tinysoundfont, m) {
         .def(py::init<py::bytes>(),
             "Load a SoundFont from a memory buffer",
             "bytes"_a)
-        .def(py::init<const std::string &>(),
+        .def(py::init<py::str>(),
             "Load a SoundFont from a .sf2 filename",
             "filename"_a)
         .def(py::init<const SoundFont &>(),
