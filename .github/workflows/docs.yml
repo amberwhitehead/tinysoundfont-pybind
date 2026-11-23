@@ -8,8 +8,8 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-python@v5
+            - uses: actions/checkout@v7
+            - uses: actions/setup-python@v7
 
             - name: Install dev requirements
               run: sudo apt install python3-pyaudio
@@ -24,7 +24,7 @@ jobs:
               run: cd doc && make html
             
             - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@v5
               with:
                   path: ./doc/build/html/
 
@@ -44,4 +44,4 @@ jobs:
         steps:
             - name: Deploy github-pages
               id: deployment
-              uses: actions/deploy-pages@v4
+              uses: actions/deploy-pages@v5
